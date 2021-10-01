@@ -282,7 +282,7 @@ def read_data(sock):
     return data
 
 
-def open_sockets(port):
+def open_sockets(target_host, port):
     try:
         local_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
@@ -305,7 +305,7 @@ def open_sockets(port):
             print("Error creating socket: %s" % e)
             os._exit(1)
         try:
-            remote_socket.connect((args.target_host, port))
+            remote_socket.connect((target_host, port))
         except socket.gaierror as e:
             print("Address-related error connecting to server: %s" % e)
             os._exit(1)
@@ -406,7 +406,10 @@ def convert_str_to_scancodes(string):
 def run():
     try:
         while True:
-            lsock, rsock = open_sockets(args.target_port)
-            RDPProxy(lsock, rsock).start()
+            x = args.target_host
+            hosts = x.split(",")
+            for host in hosts:
+                lsock, rsock = open_sockets(host, args.target_port)
+                RDPProxy(lsock, rsock).start()
     except KeyboardInterrupt:
         pass
